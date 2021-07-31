@@ -58,7 +58,7 @@ namespace AGTIAADDIN.Utility
                 _state = ExitState.CouldNotExport;
                 return;
             }
-            bool changeSuccessful = false;
+            bool changeSuccessful;
 
             changeSuccessful = XmlEdit.CreateCSV(filePath);
             if (!changeSuccessful)
@@ -93,7 +93,7 @@ namespace AGTIAADDIN.Utility
                 case ExitState.IsLibraryType:
                     return "Library types are not supported.";
                 case ExitState.Successful:
-                    return "The block type was changed successfully.";
+                    return "The CSV file was created successfuly!.";
                 default:
                     return "";
             }
