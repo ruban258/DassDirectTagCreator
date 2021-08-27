@@ -35,6 +35,7 @@ namespace AGTIAADDIN
         
         private void AddInClick(MenuSelectionProvider menuSelectionProvider)
         {
+
             using (var fileStream = new FileStream(_traceFilePath, FileMode.Append))
             {
                 Trace.Listeners.Add(new TextWriterTraceListener(fileStream) {TraceOutputOptions = TraceOptions.DateTime});
@@ -47,49 +48,14 @@ namespace AGTIAADDIN
                     blocks.Add(new Block(block));                  
                     
                 }
-
-                using (var exclusiveAccess = _tiaPortal.ExclusiveAccess("Converting " + blocks.Count + " blocks..."))
+                foreach (var block in blocks)
                 {
-                    var project = _tiaPortal.Projects.First();
-                    using (var transaction = exclusiveAccess.Transaction(project, "Convert blocks"))
+                    if (block.IsDataBlock)
                     {
-                        foreach (var block in blocks)
-                        {
-                            if (block.IsDataBlock)
-                            {
-                                block.CreateTags();
-                            }                           
-                        }                       
-
-                        var showMessageBox = false;
-                        var message = string.Empty;
-                        foreach (var block in blocks)
-                        {
-                            if (block.ChangeSuccessful == false)
-                            {
-                                message +=
-                                    "Block: " + block.BlockName + Environment.NewLine +
-                                    "Reason: " + block.GetStateText() + Environment.NewLine +
-                                    "Action: " + block.GetActionText() + Environment.NewLine + Environment.NewLine;
-                                showMessageBox = true;
-                            }
-                        }
-
-                        if (showMessageBox)
-                        {
-                            exclusiveAccess.Text = "Completed!" + Environment.NewLine + "See the message box for further information.";
-                            using (var owner = Util.GetForegroundWindow())
-                            {
-                                MessageBox.Show(owner, "The following blocks could not be converted:" + Environment.NewLine + Environment.NewLine + message, "FC-FB Converter", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            }
-                        }
-
-                        if (transaction.CanCommit)
-                        {
-                            transaction.CommitOnDispose();
-                        }
+                        block.CreateTags();
                     }
-                }
+                }                
+                
                 Trace.Close();
             }
 

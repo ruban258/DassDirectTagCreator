@@ -33,26 +33,29 @@ namespace AGTIAADDIN.Utility
                     var offset = member.ChildNodes[0].ChildNodes[0].InnerText;
                     var byteOffset = int.Parse(offset) / 8;
                     var bitOffset = int.Parse(offset) % 8;
-                    if (dataType != "Bool")
+                    if (dataType == "Bool")
+                    {
+                        tagrecords.Add(new TagRecord { TagName = name, Address = "DB" + dbNumber + "," + "X" + byteOffset + "." + bitOffset });
+                        //tagrecords.Add(new TagRecord { TagName = name, Address = "DB" + dbNumber + "," + dataType.ToUpper() + byteOffset });
+                    }
+                    else if (dataType.ToUpper() == "TIME")
+                    {
+                        tagrecords.Add(new TagRecord { TagName = name, Address = "DB" + dbNumber + "," + "REAL" + byteOffset });
+                    }
+                    else
                     {
                         tagrecords.Add(new TagRecord { TagName = name, Address = "DB" + dbNumber + "," + dataType.ToUpper() + byteOffset });
                     }
-                    else if (dataType == "Bool")
-                    {
-                        tagrecords.Add(new TagRecord { TagName = name, Address = "DB" + dbNumber + "," + "X" + byteOffset + "." + bitOffset });
-                    }
-                }            
+                }
 
                 var csv = new StringBuilder();
                 foreach (var item in tagrecords)
                 {
                     //Suggestion made by KyleMit
-                    var newLine = string.Format("\"{0}\",\"{1}\"", item.TagName, item.Address);
+                    var newLine = string.Format("\"{0}\";\"{1}\"", item.TagName, item.Address);
                     csv.AppendLine(newLine);
-                    //after your loop                   
-
                 }
-                File.WriteAllText("C:\\Temp\\CSV\\" + dbNumber + ".csv", csv.ToString());
+                File.WriteAllText("C:\\Temp\\CSV\\" + dbNumber + ".csv", csv.ToString(),Encoding.UTF8);
 
                 return true;
             }
